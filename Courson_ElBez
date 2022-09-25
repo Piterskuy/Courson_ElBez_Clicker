@@ -1,0 +1,166 @@
+from selenium import webdriver
+from selenium.webdriver.common.keys import Keys
+from selenium.webdriver.common.by import By
+# from selenium.webdriver.support.ui import Ui
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.chrome.service import Service
+from webdriver_manager.chrome import ChromeDriverManager
+import time
+
+def training_module():
+	#Check blocks to be done in Training mode
+	print("List of Train Blocks launched")
+	btn_courses = driver.find_elements(by = By.CSS_SELECTOR, value = "div.pt-1.pt-lg-2.text-right.text-md-left > a")
+	print("Total Blocks",len(btn_courses))
+	btn_course_id = 0
+	for btn_course in btn_courses:
+		btn_course_id += 1
+		print("Current Train block id", btn_course_id)
+		if btn_course.text != "Начать заново":
+			print("Start training with block #",btn_course_id)
+			print(btn_course.get_attribute('href'))
+			driver.get(btn_course.get_attribute('href'))
+			break
+
+s=Service(ChromeDriverManager().install())
+driver = webdriver.Chrome(service=s)
+driver.get("https://courson.ru/login")
+
+driver.implicitly_wait(10)
+
+# Login routine
+login = driver.find_element(by = By.NAME,value = "emailOrLogin")
+login.send_keys("USERNAME")
+passw = driver.find_element(by = By.NAME,value = "password")
+passw.send_keys("PASSWORD")
+
+btn_login = driver.find_element(by = By.CSS_SELECTOR, value = ".btn.position-relative.btn-primary")
+btn_login.click()
+
+#Select Electro course
+courses = driver.find_elements(by = By.CSS_SELECTOR, value = ".card-course__title")
+course_id = 0
+for course in courses:
+	course_id += 1
+	title = course.text
+	# print("Current id", course_id)
+	if title == "Правила работы в электроустановках":
+		print("MATCH",title,"with id", course_id)
+		break
+
+# driver.find_element(By.LINK_TEXT,"Перейти").click()
+# print(driver.find_element(By.LINK_TEXT,"Перейти").text)
+# print(driver.find_element(By.LINK_TEXT,"Перейти").tag_name)
+# print(driver.find_element_by_css_selector("div.card-course__content-actions > a").get_attribute('href'))
+
+btn_courses = driver.find_elements(by = By.CSS_SELECTOR, value = "div.card-course__content-actions > a")
+btn_course_id = 0
+for btn_course in btn_courses:
+	btn_course_id += 1
+	# print("Current btn course id", btn_course_id)
+	if btn_course_id == course_id:
+		print(btn_course.get_attribute('href'))
+		driver.get(btn_course.get_attribute('href'))
+		break
+
+#Open training windows
+courses = driver.find_elements(by = By.CSS_SELECTOR, value = ".card-course__title")
+course_id = -1 # decrement due to course name has the same CSS style and no button
+for course in courses:
+	course_id += 1
+	title = course.text
+	# print("Current id", course_id)
+	if title == "Тренажер":
+		print("MATCH",title,"with id", course_id)
+		break
+
+# driver.find_element(By.LINK_TEXT,"Перейти").click()
+# print(driver.find_element(By.LINK_TEXT,"Перейти").text)
+# print(driver.find_element(By.LINK_TEXT,"Перейти").tag_name)
+# print(driver.find_element_by_css_selector("div.card-course__content-actions > a").get_attribute('href'))
+
+btn_courses = driver.find_elements(by = By.CSS_SELECTOR, value = "div.card-course__content-actions > a")
+btn_course_id = 0
+for btn_course in btn_courses:
+	btn_course_id += 1
+	print("Current btn course id", btn_course_id)
+	if btn_course_id == course_id:
+		print(btn_course.get_attribute('href'))
+		driver.get(btn_course.get_attribute('href'))
+		break
+
+#Go on with Training
+btn_course = driver.find_element(by = By.CSS_SELECTOR, value = "div.card-topic__detail > a")
+print(btn_course.get_attribute('href'))
+driver.get(btn_course.get_attribute('href'))
+
+training_module()
+
+#Inside of training Block
+print("Inside of training Block")
+# answers = driver.find_elements(by = By.CSS_SELECTOR, value = "div.custom-control.custom-checkbox.mb-2 > input")
+# for answer in answers:
+# 	print(answer._id)
+# 	answer.send_keys(Keys.RETURN)
+
+
+while True:
+	# try:
+	# 	main = WebDriverWait(driver,10).until(
+	# 	EC.presence_of_element_located((By.CSS_SELECTOR, "[id^='answer_']"))
+	# 	)
+		
+		# Find element that id started with 'answer_'
+		answers = driver.find_elements(by = By.CSS_SELECTOR, value = "[id^='answer_']")
+
+		for answer in answers:
+			cur_answ_id =  answer.get_attribute('id')
+			print(cur_answ_id)
+			label = driver.find_element(by = By.CSS_SELECTOR, value = "[for='" + cur_answ_id + "']")
+			print("Labels",label)
+			label.click()
+			break
+		
+		try:
+			btn_next = driver.find_element(by = By.CSS_SELECTOR, value = "button.btn.btn-danger.btn-flex.btn-xs.btn-lg-only-lg.ml-auto.ml-md-0.position-relative")
+		except:
+		 	# Block ends proceed with other
+		 	training_module()
+		
+		WebDriverWait(driver, 5).until(EC.element_to_be_clickable(btn_next))
+		
+		btn_next.click()
+		btn_next.click()
+		time.sleep(1)
+	# except:
+	# 	driver.quit()
+	
+
+
+
+
+# answers = driver.find_elements(by = By.CSS_SELECTOR, value = ".custom-control-input")
+# for answer in answers:
+# 	print(answer._id)
+# 	answer.click()
+
+
+# Waiting fot the course page loading
+
+# driver.get("https://courson.ru/profile/education/programs/1632391")
+
+
+
+
+# print(driver.title)
+time.sleep(200)
+
+
+# try:
+# 	main = WebDriverWait(driver,10).until(
+# 		EC.driver.
+# 		EC.presence_of_element_located((By.NAME, "emailOrLogin"))
+# 		)
+# except:
+# 	driver.quit()
